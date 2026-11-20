@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>كتب اليمن 3D - العلوم للصف السابع (ج1)</title>
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --accent: #d97706;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+    }
+    body.dark {
+      --bg: #0b1120;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 72px;
+      transition: background 0.2s, color 0.2s;
+    }
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    h1 { margin: 0; font-size: 1.15rem; }
+    .subtitle { font-size: 0.8rem; opacity: 0.9; margin-top: 2px; }
+    .btn-icon {
+      background: rgba(255,255,255,0.18);
+      border: none;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .tab-btn {
+      flex: 1;
+      border: none;
+      padding: 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: #fff;
+      color: var(--primary-dark);
+    }
+    main { padding: 14px; max-width: 720px; margin: 0 auto; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .unit-badge {
+      display: inline-block;
+      background: rgba(15, 118, 110, 0.12);
+      color: var(--primary);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    body.dark .unit-badge { background: rgba(45, 212, 191, 0.15); color: #5eead4; }
+    .lesson-title { margin: 4px 0 6px; font-size: 1rem; }
+    .lesson-desc { margin: 0 0 10px; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+    /* 3D Scene Stage */
+    .stage-3d {
+      perspective: 900px;
+      height: 230px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(15,118,110,0.14), transparent 72%);
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      margin: 10px 0;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .cube-3d {
+      width: 110px;
+      height: 110px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(-24deg) rotateY(32deg);
+      transition: transform 0.12s ease-out;
+    }
+    .face {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      border: 2px solid rgba(255,255,255,0.7);
+      background: rgba(15, 118, 110, 0.78);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 6px;
+      border-radius: 10px;
+    }
+    .front  { transform: translateZ(55px); }
+    .back   { transform: rotateY(180deg) translateZ(55px); background: rgba(17, 94, 89, 0.85); }
+    .right  { transform: rotateY(90deg) translateZ(55px); background: rgba(217, 119, 6, 0.82); }
+    .left   { transform: rotateY(-90deg) translateZ(55px); background: rgba(2, 132, 199, 0.82); }
+    .top    { transform: rotateX(90deg) translateZ(55px); background: rgba(13, 148, 136, 0.85); }
+    .bottom { transform: rotateX(-90deg) translateZ(55px); background: rgba(51, 65, 85, 0.88); }
+
+    .controls-3d {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: right;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    .correct { background: #dcfce7 !important; border-color: #16a34a !important; color: #14532d !important; }
+    .wrong { background: #fee2e2 !important; border-color: #dc2626 !important; color: #7f1d1d !important; }
+    .hidden { display: none; }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px;
+      z-index: 20;
+    }
+    .nav-item {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .nav-item.active { color: var(--primary); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <div>
+        <h1>كتب اليمن التعليمية 3D</h1>
+        <div class="subtitle">العلوم - الصف السابع الأساسي (الجزء الأول)</div>
+      </div>
+      <button class="btn-icon" onclick="toggleTheme()">🌙 / ☀️</button>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-lessons" onclick="switchTab('lessons')">الدروس والوحدات</button>
+      <button class="tab-btn" id="tab-3d" onclick="switchTab('3d')">المختبر 3D</button>
+      <button class="tab-btn" id="tab-quiz" onclick="switchTab('quiz')">اختبر نفسك</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Lessons Tab -->
+    <section id="view-lessons">
+      <div class="card">
+        <span class="unit-badge">الوحدة 1: تركيب المادة</span>
+        <h2 class="lesson-title">الدرس الأول: الجزيء والذرة</h2>
+        <p class="lesson-desc">
+          الجزيء أصغر جزء من المادة يمكن أن يوجد منفرداً محتفظاً بخواصها، بينما الذرة أصغر جزء من العنصر يشارك في التفاعلات الكيميائية. يتكون جزيء الماء من ذرتي هيدروجين وذرة أكسجين.
+        </p>
+        <div class="actions">
+          <button class="btn btn-accent" onclick="open3DModel('molecule')">فتح مجسم الجزيء 3D</button>
+          <button class="btn btn-outline" onclick="switchTab('quiz')">اختبار سريع</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="unit-badge">الوحدة 2: المواد من حولنا</span>
+        <h2 class="lesson-title">حالات المادة وتحولاتها</h2>
+        <p class="lesson-desc">
+          توجد المادة في حالات صلبة وسائلة وغازية، وتتغير بالحرارة والتبريد عبر الانصهار، التجمد، التبخر، والتكثف، مع اختلاف ترتيب وتقارب الجزيئات.
+        </p>
+        <div class="actions">
+          <button class="btn btn-accent" onclick="open3DModel('states')">محاكاة حالات المادة 3D</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="unit-badge">الوحدة 4: خواص الأجسام وقياساتها</span>
+        <h2 class="lesson-title">الحجم والكثافة والحركة الخطية</h2>
+        <p class="lesson-desc">
+          الكثافة هي كتلة وحدة الحجوم (الكثافة = الكتلة ÷ الحجم)، وتحدد طفو الأجسام أو غوصها في الماء، بينما تُقاس السرعة بقسمة المسافة على الزمن.
+        </p>
+        <div class="actions">
+          <button class="btn btn-accent" onclick="open3DModel('density')">مجسم الكثافة والأبعاد 3D</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="unit-badge">الوحدة 5 &amp; 6: الحرارة والكائنات الحية</span>
+        <h2 class="lesson-title">انتقال الحرارة والبدائيات والحيوانات</h2>
+        <p class="lesson-desc">
+          تنتقل الحرارة بالتوصيل والحمل والإشعاع وتسبب تمدد الأجسام، وتصنف الكائنات الحية إلى بدائيات وطلائعيات وفطريات ونباتات وحيوانات.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3D Lab Tab -->
+    <section id="view-3d" class="hidden">
+      <div class="card">
+        <span class="unit-badge" id="model-tag">نموذج ثلاثي الأبعاد تفاعلي</span>
+        <h2 class="lesson-title" id="model-title">مجسم جزيء الماء والذرات (3D)</h2>
+        <p class="lesson-desc" id="model-info">
+          اسحب أو استخدم أزرار التدوير لاستكشاف المجسم ثلاثي الأبعاد وفهم بنية المادة.
+        </p>
+
+        <div class="stage-3d" id="stage3d">
+          <div class="cube-3d" id="cube3d">
+            <div class="face front" id="f-front">O (أكسجين)</div>
+            <div class="face back" id="f-back">H2O (ماء)</div>
+            <div class="face right" id="f-right">H (هيدروجين)</div>
+            <div class="face left" id="f-left">H (هيدروجين)</div>
+            <div class="face top" id="f-top">ذرة / جزيء</div>
+            <div class="face bottom" id="f-bottom">تركيب المادة</div>
+          </div>
+        </div>
+
+        <div class="controls-3d">
+          <button class="btn btn-outline" onclick="rotateCube(-25, 0)">⬆️ للأعلى</button>
+          <button class="btn btn-outline" onclick="rotateCube(25, 0)">⬇️ للأسفل</button>
+          <button class="btn btn-primary" onclick="resetCube()">🔄 إعادة ضبط</button>
+          <button class="btn btn-outline" onclick="rotateCube(0, -25)">↪️ يسار</button>
+          <button class="btn btn-outline" onclick="rotateCube(0, 25)">↩️ يمين</button>
+          <button class="btn btn-accent" onclick="cycleModel()">🔀 تبديل المجسم</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quiz Tab -->
+    <section id="view-quiz" class="hidden">
+      <div class="card">
+        <span class="unit-badge">تقويم تفاعلي</span>
+        <h2 class="lesson-title">سؤال 1: يتكون جزيء الماء من ارتباط:</h2>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">ذرة هيدروجين واحدة وذرتي أكسجين</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">ذرتي هيدروجين وذرة أكسجين واحدة</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">ثلاث ذرات كربون فقط</button>
+        <p class="lesson-desc" id="quiz-feedback" style="margin-top:10px; font-weight:600;"></p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('lessons')"><span>📘</span><span>الكتاب</span></button>
+    <button class="nav-item" onclick="switchTab('3d')"><span>🧊</span><span>المجسمات 3D</span></button>
+    <button class="nav-item" onclick="switchTab('quiz')"><span>✅</span><span>الاختبارات</span></button>
+  </nav>
+
+  <script>
+    let rotX = -24, rotY = 32;
+    let currentModelIdx = 0;
+    const models = [
+      {
+        tag: "الوحدة 1: تركيب المادة",
+        title: "مجسم جزيء الماء والذرات (3D)",
+        info: "يتكون جزيء الماء (H2O) من ذرتي هيدروجين مرتبطتين بذرة أكسجين واحدة.",
+        faces: ["O أكسجين", "H2O ماء", "H هيدروجين", "H هيدروجين", "جزيء", "ذرة"]
+      },
+      {
+        tag: "الوحدة 2: حالات المادة",
+        title: "تحولات حالات المادة بالحرارة (3D)",
+        info: "الصلبة لها شكل وحجم ثابتان، السائلة تأخذ شكل الإناء، والغازية تنتشر وتملأ الحيز.",
+        faces: ["صلبة", "سائلة", "غازية", "انصهار", "تبخر", "تكثف"]
+      },
+      {
+        tag: "الوحدة 4: الكثافة والقياس",
+        title: "مكعب الحجم والكثافة (3D)",
+        info: "الكثافة = الكتلة ÷ الحجم؛ الأجسام الأقل كثافة من الماء تطفو مثل الخشب والزيت.",
+        faces: ["الكتلة (ك)", "الحجم (ح)", "الكثافة", "طفو الخشب", "غوص الحديد", "جم/سم³"]
+      }
+    ];
+
+    function updateCube() {
+      document.getElementById("cube3d").style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+    function rotateCube(dx, dy) {
+      rotX += dx; rotY += dy; updateCube();
+    }
+    function resetCube() {
+      rotX = -24; rotY = 32; updateCube();
+    }
+    function open3DModel(type) {
+      if (type === "molecule") currentModelIdx = 0;
+      else if (type === "states") currentModelIdx = 1;
+      else if (type === "density") currentModelIdx = 2;
+      applyModel();
+      switchTab("3d");
+    }
+    function cycleModel() {
+      currentModelIdx = (currentModelIdx + 1) % models.length;
+      applyModel();
+    }
+    function applyModel() {
+      const m = models[currentModelIdx];
+      document.getElementById("model-tag").textContent = m.tag;
+      document.getElementById("model-title").textContent = m.title;
+      document.getElementById("model-info").textContent = m.info;
+      const ids = ["f-front", "f-back", "f-right", "f-left", "f-top", "f-bottom"];
+      ids.forEach((id, i) => document.getElementById(id).textContent = m.faces[i]);
+    }
+    function switchTab(tab) {
+      ["lessons", "3d", "quiz"].forEach(t => {
+        document.getElementById("view-" + t).classList.toggle("hidden", t !== tab);
+        document.getElementById("tab-" + t).classList.toggle("active", t === tab);
+      });
+      document.querySelectorAll(".nav-item").forEach((el, idx) => {
+        el.classList.toggle("active", (tab === "lessons" && idx === 0) || (tab === "3d" && idx === 1) || (tab === "quiz" && idx === 2));
+      });
+    }
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+    function checkAnswer(btn, isCorrect) {
+      document.querySelectorAll(".quiz-option").forEach(b => b.classList.remove("correct", "wrong"));
+      const fb = document.getElementById("quiz-feedback");
+      if (isCorrect) {
+        btn.classList.add("correct");
+        fb.textContent = "أحسنت! إجابة صحيحة (ذرتي هيدروجين وذرة أكسجين).";
+      } else {
+        btn.classList.add("wrong");
+        fb.textContent = "حاول مرة أخرى؛ تذكر تركيب جزيء الماء (H2O).";
+      }
+    }
+
+    // Touch drag support on 3D stage
+    const stage = document.getElementById("stage3d");
+    let lastX = null, lastY = null;
+    stage.addEventListener("pointerdown", e => { lastX = e.clientX; lastY = e.clientY; });
+    stage.addEventListener("pointermove", e => {
+      if (lastX === null || lastY === null) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      rotY += dx * 0.6;
+      rotX -= dy * 0.6;
+      updateCube();
+      lastX = e.clientX; lastY = e.clientY;
+    });
+    stage.addEventListener("pointerup", () => { lastX = null; lastY = null; });
+  </script>
+</body>
+</html>
